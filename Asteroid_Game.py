@@ -12,19 +12,17 @@ background = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Devel
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 rocket = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/image/rocket.jpg")
-
+rocket = pygame.transform.scale(rocket, (100, 100))
 clock = pygame.time.Clock()
 
 
 rocket_x = WIDTH//2
 rocket_y = 100
-rocket_width = 50
-rocket_height = 50
+rocket_width = 100
+rocket_height = 100
 
-
-circle_radius = 20
-circle_x = random.randint(circle_radius, WIDTH - circle_radius)
-circle_y = HEIGHT
+asteroid_x = HEIGHT
+asteroid_y = 100
 
 rocket_rect = pygame.Rect(rocket_x, rocket_y, rocket_width, rocket_height)
 score = 0
@@ -33,17 +31,40 @@ font = pygame.font.SysFont(None, 36)
 asteroids = []
 asteroid_radius = 20
 asteroid_speed = 3
+
 last_spawn = pygame.time.get_ticks()
+spawn_delay = 2000 
 
 start_time = time.time()
+
+
+
+
+
+
+
+
+
+
 
 run = True
 while run:
     screen.blit(background, (0, 0))
     screen.blit(rocket, (rocket_rect.x, rocket_rect.y))
-    
-    
+
+
+  
     mouse_x, mouse_y = pygame.mouse.get_pos()
+
+    rocket_rect.x = mouse_x - rocket_width // 2
+    rocket_rect.y = mouse_y - rocket_height // 2
+
+
+
+
+
+
+
 
     pygame.display.update()
 
