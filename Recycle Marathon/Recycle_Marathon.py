@@ -8,11 +8,11 @@ WIDTH = 600
 HEIGHT = 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 score = 0
-
+font = pygame.font.SysFont("Calibri", 20)
 background = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/recycle_bg.png")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 run = True
-
+score = 0
 class Bin(pygame.sprite.Sprite):
     
     def __init__(self):
@@ -42,7 +42,16 @@ class Recyable_Trash(pygame.sprite.Sprite):
         self.rect.x = random.randint(50, WIDTH - 50)
         self.rect.y = random.randint(50, HEIGHT - 50)
 
-
+class Non_Recyable_Trash(pygame.sprite.Sprite):
+    objects1 = ["plastic_bag.png"]
+    def __init__(self):
+        super().__init__()
+        random_image1 = random.choice(self.objects1)
+        self.image = pygame.image.load ("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/" + random_image1)
+        self.image = pygame.transform.scale(self.image, (20, 30))
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(50, WIDTH - 50)
+        self.rect.y = random.randint(50, HEIGHT - 50)
 
 
 bin_group = pygame.sprite.Group()
@@ -54,17 +63,19 @@ for i in range(50):
     recyable_trash = Recyable_Trash()
     recyable_trash_group.add(recyable_trash)
 
+non_recyable_trash_group = pygame.sprite.Group()
+for i in range (20):
+    non_recyable_trash = Non_Recyable_Trash()
+    non_recyable_trash_group.add(non_recyable_trash)
+
+
 while run:
     screen.blit(background, (0, 0))
     
     bin_group.draw(screen)
     recyable_trash_group.draw(screen)
-   
-
-
-
-
-
+    non_recyable_trash_group.draw(screen)
+    
 
     for event in pygame.event.get():
         if event.type == pygame.quit:
@@ -72,7 +83,17 @@ while run:
             pygame.quit()
 
 
+
+
+
+
     keys_pressed = pygame.key.get_pressed()
     bin_group.update(keys_pressed)
+    recyable_trash_list = pygame.sprite.spritecollide(bin, recyable_trash_group, True)
+    non_recyable_trash_list = pygame.sprite.spritecollide(bin, non_recyable_trash_group, True)
+    score = len(recyable_trash_list) - 3* len(non_recyable_trash_list)
+    print(recyable_trash_list)
+    score_text = font.render("Your Score is " + str(score), True, (0,0,0))
+    screen.blit(score_text, (WIDTH - 150,10))
     pygame.display.update()
 
