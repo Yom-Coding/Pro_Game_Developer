@@ -12,6 +12,10 @@ font = pygame.font.SysFont("Calibri", 20)
 background = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/recycle_bg.png")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 run = True
+start_time = 0
+time_passed = 0
+time_limit = 30
+score_limit = 20
 score = 0
 class Bin(pygame.sprite.Sprite):
     
@@ -68,32 +72,40 @@ for i in range (20):
     non_recyable_trash = Non_Recyable_Trash()
     non_recyable_trash_group.add(non_recyable_trash)
 
+start_time = time.time()
+
+
+
+
 
 while run:
     screen.blit(background, (0, 0))
-    
-    bin_group.draw(screen)
-    recyable_trash_group.draw(screen)
-    non_recyable_trash_group.draw(screen)
-    
 
     for event in pygame.event.get():
         if event.type == pygame.quit:
             run = False
             pygame.quit()
 
-
-
-
-
-
-    keys_pressed = pygame.key.get_pressed()
-    bin_group.update(keys_pressed)
-    recyable_trash_list = pygame.sprite.spritecollide(bin, recyable_trash_group, True)
-    non_recyable_trash_list = pygame.sprite.spritecollide(bin, non_recyable_trash_group, True)
-    score = len(recyable_trash_list) - 3* len(non_recyable_trash_list)
-    print(recyable_trash_list)
-    score_text = font.render("Your Score is " + str(score), True, (0,0,0))
-    screen.blit(score_text, (WIDTH - 150,10))
+    time_passed = time.time() - start_time
+    if time_passed < time_limit:
+        bin_group.draw(screen)
+        recyable_trash_group.draw(screen)
+        non_recyable_trash_group.draw(screen)
+        keys_pressed = pygame.key.get_pressed()
+        bin_group.update(keys_pressed)
+        recyable_trash_list = pygame.sprite.spritecollide(bin, recyable_trash_group, True)
+        non_recyable_trash_list = pygame.sprite.spritecollide(bin, non_recyable_trash_group, True)
+        score = score + len(recyable_trash_list) - 3* len(non_recyable_trash_list)
+        print(recyable_trash_list)
+        score_text = font.render("Your Score is " + str(score), True, (0,0,0))
+        screen.blit(score_text, (WIDTH - 150,10))
+    else:
+        if score >= score_limit:
+            game_over_text = font.render("You Have Won", True, (0,0,0))
+            screen.blit(game_over_text, (WIDTH/2, HEIGHT/2))
+        else:
+            lose_text = font.render("You Have Lost", True, (0,0,0))
+            screen.blit(lose_text, (WIDTH/2, HEIGHT/2))
+    
     pygame.display.update()
 
