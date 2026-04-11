@@ -8,104 +8,107 @@ WIDTH = 600
 HEIGHT = 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 score = 0
-font = pygame.font.SysFont("Calibri", 20)
-background = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/recycle_bg.png")
-background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-run = True
+max_time = 60
+last_spawn_time = 0
 start_time = 0
 time_passed = 0
-time_limit = 30
-score_limit = 20
-score = 0
-class Bin(pygame.sprite.Sprite):
-    
-    def __init__(self):
+class Asteroids(pygame.sprite.Sprite):
+
+    def __init__(self): 
         super().__init__()
-        self.image = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/bin.png")
-        self.image = pygame.transform.scale(self.image, (20, 25))
+        self.image = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/image/g-removebg-preview.png")
+        self.image = pygame.transform.scale(self.image, (20,60))
         self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - 50)
+        self.rect.y = 0
+        self.wave = 0
+
+    def update(self):
+        self.rect.y += 2   
+
+        if self.rect.y > HEIGHT:
+            self.wave = self.wave + 1
+            self.rect.y = 0
+            self.rect.x = random.randint(0, WIDTH - 50)
+
         
-    def update(self, keys):
-        if keys[pygame.K_RIGHT] and self.rect.right < WIDTH:
-            self.rect.x = self.rect.x + 1
-        if keys[pygame.K_LEFT] and self.rect.left > 0:
-            self.rect.x = self.rect.x - 1
-        if keys[pygame.K_UP] and self.rect.top > 0:
-            self.rect.y = self.rect.y - 1
-        if keys[pygame.K_DOWN] and self.rect.bottom < HEIGHT:
-            self.rect.y = self.rect.y + 1
-
-class Recyable_Trash(pygame.sprite.Sprite):
-    objects = ["bag.png", "box1.png", "pencil.png"]
-    def __init__(self):
-        super().__init__()
-        random_image = random.choice(self.objects)
-        self.image = pygame.image.load ("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/" + random_image)
-        self.image = pygame.transform.scale(self.image, (20, 30))
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(50, WIDTH - 50)
-        self.rect.y = random.randint(50, HEIGHT - 50)
-
-class Non_Recyable_Trash(pygame.sprite.Sprite):
-    objects1 = ["plastic_bag.png"]
-    def __init__(self):
-        super().__init__()
-        random_image1 = random.choice(self.objects1)
-        self.image = pygame.image.load ("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/Recycle Marathon/Images/" + random_image1)
-        self.image = pygame.transform.scale(self.image, (20, 30))
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(50, WIDTH - 50)
-        self.rect.y = random.randint(50, HEIGHT - 50)
 
 
-bin_group = pygame.sprite.Group()
-bin = Bin()
-bin_group.add(bin)
 
-recyable_trash_group = pygame.sprite.Group()
-for i in range(50):
-    recyable_trash = Recyable_Trash()
-    recyable_trash_group.add(recyable_trash)
 
-non_recyable_trash_group = pygame.sprite.Group()
-for i in range (20):
-    non_recyable_trash = Non_Recyable_Trash()
-    non_recyable_trash_group.add(non_recyable_trash)
+
+background = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/image/space.jpg")
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+rocket = pygame.image.load("/Users/yompatel/Desktop/Jet Learn/Pro Game Developer/image/rocket.jpg")
+rocket = pygame.transform.scale(rocket, (70, 70))
+clock = pygame.time.Clock()
 
 start_time = time.time()
+last_spawn_time = round(start_time)
+
+rocket_x = WIDTH//2
+rocket_y = 100
+rocket_width = 70
+rocket_height = 70
+
+
+rocket_rect = pygame.Rect(rocket_x, rocket_y, rocket_width, rocket_height)
+font = pygame.font.SysFont(None, 36)
 
 
 
+asteroid_group = pygame.sprite.Group()
+
+for i in range(5):
+    asteroid1 = Asteroids()
+    asteroid_group.add(asteroid1)
+    
+
+game_over = False
+
+difficulty_up = True
 
 
+run = True
 while run:
     screen.blit(background, (0, 0))
+    current_time = time.time()
+    time_passed = round(current_time - start_time)
+    time_text = font.render("Timer:" + str(max_time - time_passed), True, (255,255,255))
+    screen.blit(time_text, (WIDTH - 120, 20))
 
-    for event in pygame.event.get():
-        if event.type == pygame.quit:
-            run = False
-            pygame.quit()
+    if round(current_time - last_spawn_time) == 5:
+        asteroid2 = Asteroids()
+        asteroid_group.add(asteroid2)
+        print(len(asteroid_group))
+        last_spawn_time = current_time
 
-    time_passed = time.time() - start_time
-    if time_passed < time_limit:
-        bin_group.draw(screen)
-        recyable_trash_group.draw(screen)
-        non_recyable_trash_group.draw(screen)
-        keys_pressed = pygame.key.get_pressed()
-        bin_group.update(keys_pressed)
-        recyable_trash_list = pygame.sprite.spritecollide(bin, recyable_trash_group, True)
-        non_recyable_trash_list = pygame.sprite.spritecollide(bin, non_recyable_trash_group, True)
-        score = score + len(recyable_trash_list) - 3* len(non_recyable_trash_list)
-        print(recyable_trash_list)
-        score_text = font.render("Your Score is " + str(score), True, (0,0,0))
-        screen.blit(score_text, (WIDTH - 150,10))
-    else:
-        if score >= score_limit:
-            game_over_text = font.render("You Have Won", True, (0,0,0))
-            screen.blit(game_over_text, (WIDTH/2, HEIGHT/2))
-        else:
-            lose_text = font.render("You Have Lost", True, (0,0,0))
-            screen.blit(lose_text, (WIDTH/2, HEIGHT/2))
+
+
     
+    if not game_over:
+        asteroid_group.update()
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        rocket_rect.x = mouse_x - rocket_width // 2
+        rocket_rect.y = mouse_y - rocket_height // 2
+
+    asteroid_group.draw(screen)
+    screen.blit(rocket, (rocket_rect.x, rocket_rect.y))
+
+
+    if not game_over:
+        for asteroid in asteroid_group:
+            if rocket_rect.colliderect(asteroid.rect):
+                print("GAME OVER")
+                game_over = True
+
+            
+
     pygame.display.update()
 
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+            pygame.quit()
